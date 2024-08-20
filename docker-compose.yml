@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+    db:
+        image: postgres:13
+        environment:
+            POSTGRES_USER: example
+            POSTGRES_PASSWORD: example
+            POSTGRES_DB: example_db
+        ports:
+            - "5433:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+
+    app:
+        build: .
+        depends_on:
+            - db
+        environment:
+            DATABASE_URL: postgresql://example:example@db:5433/example_db
+            LOGICAL_ENV: ${LOGICAL_ENV}
+            SERVICE_URL: ${EMERGENCY_INFO_SERVICE_URL}
+            PYTHONUNBUFFERED: 1
+            RUNNING_PORT: 8205
+        command: bash etc/entrypoint.sh
+        volumes:
+            - .:/app
+        ports:
+            - 8205:8000
+        links:
+            - db
+        # image: game_process_calculator
+        # container_name: game_process_calculator
+
+volumes:
+  postgres_data:
